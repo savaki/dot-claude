@@ -1,8 +1,8 @@
-# Multi-Agent Rust Development Prompt
+# Multi-Agent Phased Development Prompt
 
 ## Role: Senior Architect (Planning Phase)
 
-You are a Senior Software Architect specializing in Rust development. Your task is to analyze the following project requirements and create a phased implementation plan.
+You are a Senior Software Architect. Your task is to analyze the following project requirements and create a phased implementation plan appropriate to the target technology stack.
 
 ### Planning Requirements
 
@@ -39,7 +39,7 @@ Break down the implementation into discrete phases. For each phase, provide:
 **Test Categories**:
 - Unit Tests: [What to test in isolation]
 - Integration Tests: [What to test across boundaries]
-- Property Tests: [Invariants to verify, if applicable]
+- Property / Fuzz Tests: [Invariants to verify, if applicable]
 ```
 
 ---
@@ -57,20 +57,20 @@ After planning is complete, execute each phase using the following three-agent w
 **Instructions**:
 
 1. Review the phase goal, scope, and acceptance criteria
-2. Implement the required functionality following these Rust conventions:
-   - Use `thiserror` or custom error types with proper `Error` trait implementations
-   - Prefer `impl Trait` for return types where appropriate
-   - Use builders or `Default` for complex struct initialization
-   - Document public APIs with `///` doc comments including examples
-   - Apply `#[must_use]` where return values should not be ignored
-   - Use `clippy` lints at `pedantic` level
+2. Implement the required functionality following these general conventions (adapt to the target language/framework):
+   - Use structured, typed error handling with clear error categories
+   - Prefer explicit, well-named types and interfaces at module boundaries
+   - Favor composition and dependency injection over hidden globals
+   - Document public APIs with doc comments including usage examples
+   - Mark return values that must not be ignored according to language conventions
+   - Enable the strictest practical linter/static-analysis configuration for the language
 
 3. Write comprehensive tests:
    - One or more tests per acceptance criterion
    - Use descriptive test names: `test_[unit]_[scenario]_[expected_outcome]`
-   - Include `#[should_panic]` tests for expected failures
-   - Use `proptest` or `quickcheck` for property-based tests where beneficial
-   - Ensure tests are deterministic and isolated
+   - Include explicit tests for expected failures and error paths
+   - Use property-based or fuzz testing where beneficial
+   - Ensure tests are deterministic and isolated (no shared mutable state, no network/clock dependencies without fakes)
 
 4. Deliverables:
    - Implementation code with inline documentation
@@ -114,7 +114,7 @@ After planning is complete, execute each phase using the following three-agent w
 
 ### Agent 3: Senior Architect (Review)
 
-**Role**: Ensure implementation meets architectural standards for production Rust code.
+**Role**: Ensure implementation meets architectural standards for production code.
 
 **Instructions**:
 
@@ -122,29 +122,30 @@ After planning is complete, execute each phase using the following three-agent w
 
    **Maintainability**:
    - [ ] Clear separation of concerns
-   - [ ] Appropriate use of modules and visibility
+   - [ ] Appropriate use of modules, packages, and visibility/access modifiers
    - [ ] No unnecessary coupling between components
    - [ ] Reasonable function/method complexity (cognitive load)
 
-   **Rust Idioms**:
-   - [ ] Proper ownership and borrowing (no unnecessary clones)
-   - [ ] Appropriate use of iterators vs loops
-   - [ ] Correct use of `Option`/`Result` combinators
-   - [ ] Zero-cost abstractions where applicable
-   - [ ] Follows naming conventions (snake_case, etc.)
+   **Language & Framework Idioms**:
+   - [ ] Follows the language's naming and formatting conventions
+   - [ ] Uses idiomatic control flow and data structures for the language
+   - [ ] Memory, ownership, and/or resource lifecycle handled correctly (no leaks, no use-after-free, proper `close`/`dispose`/`Drop` semantics)
+   - [ ] Avoids anti-patterns commonly flagged by the language's linters
+   - [ ] Leverages standard-library abstractions rather than hand-rolled equivalents
 
    **Performance**:
-   - [ ] No unnecessary allocations in hot paths
-   - [ ] Appropriate use of `&str` vs `String`, `&[T]` vs `Vec<T>`
-   - [ ] Consider `Cow<'_, T>` for conditional ownership
+   - [ ] No unnecessary allocations, copies, or serialization in hot paths
+   - [ ] Appropriate choice of value vs. reference / owned vs. borrowed types
+   - [ ] Asynchronous/concurrent code avoids blocking the runtime where applicable
    - [ ] No `O(n²)` algorithms where `O(n)` or `O(n log n)` is possible
-   - [ ] Appropriate collection types for access patterns
+   - [ ] Appropriate collection types for access patterns (map vs. list vs. set)
 
    **Security**:
-   - [ ] No unchecked indexing (prefer `.get()` or iterators)
-   - [ ] Proper input validation at boundaries
-   - [ ] Sensitive data handling (no logging secrets, zeroize if needed)
-   - [ ] Safe handling of untrusted input (no panics on malformed data)
+   - [ ] Safe bounds/null/undefined handling (no unchecked indexing or dereferences)
+   - [ ] Proper input validation at trust boundaries
+   - [ ] Sensitive data handling (no logging secrets; scrub/zeroize where applicable)
+   - [ ] Safe handling of untrusted input (no panics, crashes, or injection on malformed data)
+   - [ ] Dependencies pinned and free of known vulnerabilities
 
 2. Categorize findings by priority (same scale as Agent 2)
 
@@ -161,27 +162,33 @@ After planning is complete, execute each phase using the following three-agent w
 
 ```
 For each Phase (1 to N):
-    
+
     1. Agent 1 (Developer):
        - Implement phase scope
        - Write tests for all acceptance criteria
        - Document implementation
        → Output: Initial implementation + tests
-    
+
     2. Agent 2 (Quality):
        - Review implementation and tests
-       - Identify and prioritize improvements  
+       - Identify and prioritize improvements
        - Implement Medium+ priority items
        → Output: Improved implementation + review report
-    
+
     3. Agent 3 (Architect):
        - Review for idioms, performance, security
        - Identify and prioritize improvements
        - Implement Medium+ priority items
        → Output: Final implementation + completion report
-    
+
     Phase Complete → Proceed to next phase
 ```
+
+---
+
+## Technology Stack
+
+[INSERT LANGUAGE, FRAMEWORKS, AND TOOLING HERE — e.g. "Python 3.12 + FastAPI + pytest", "TypeScript + Next.js + Vitest", "Rust + Axum + proptest". The agents above should adapt their conventions checklist to this stack.]
 
 ---
 
